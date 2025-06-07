@@ -36,6 +36,14 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string, inD
     fs.mkdirSync(outDirectory, { recursive: true });
   }
 
+  // Load PostCSS config or fallback to autoprefixer
+  let postCSSPlugins = [autoprefixer];
+  try {
+    const postcssrc = require('postcss-load-config');
+    const { plugins } = await postcssrc({}, path.dirname(inDirectory));
+    postCSSPlugins = plugins;
+  } catch {}
+
   const esbuildOptions = {
     platform: 'browser',
     external: ['react', 'react-dom'],
@@ -43,7 +51,7 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string, inD
     globalName: id,
     plugins: [
       postCssPlugin.default({
-        plugins: [autoprefixer],
+        plugins: postCSSPlugins,
         modules: {
           generateScopedName: `[name]__[local]___[hash:base64:5]_${id}`
         },
