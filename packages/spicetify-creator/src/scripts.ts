@@ -7,6 +7,7 @@ import buildExtension from './buildExtension'
 import { externalGlobalPlugin } from 'esbuild-plugin-external-global'
 const postCssPlugin = require("esbuild-plugin-postcss2");
 const autoprefixer = require("autoprefixer");
+const postcssrc = require('postcss-load-config');
 
 const exec = promisify(require('child_process').exec);
 
@@ -39,7 +40,6 @@ const build = async (watch: boolean, minify: boolean, outDirectory?: string, inD
   // Load PostCSS config or fallback to autoprefixer
   let postCSSPlugins = [autoprefixer];
   try {
-    const postcssrc = require('postcss-load-config');
     const { plugins } = await postcssrc({}, path.dirname(inDirectory));
     postCSSPlugins = plugins;
   } catch {}
